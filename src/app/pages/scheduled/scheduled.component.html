@@ -1,0 +1,110 @@
+<app-window title="Agenda">
+	<div *ngIf="scheduled.length > 0" class="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
+		<table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+			<thead class="text-xs text-gray-700 uppercase bg-gray-50">
+				<tr>
+					<th scope="col" class="pl-6 pr-16 py-3">Nome</th>
+					<th scope="col" class="px-16 py-3">Serviço</th>
+					<th scope="col" class="px-16 py-3">Preço</th>
+					<th scope="col" class="pl-3 py-3 pr-32 text-right">Ação</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr
+					*ngFor="let item of displayedItems; let i = index"
+					class="bg-white border-b hover:bg-gray-50"
+				>
+					<th
+						scope="row"
+						class="pl-6 pr-16 py-4 font-medium text-gray-900 whitespace-nowrap"
+					>
+						{{ item.name }}
+					</th>
+					<td class="px-16 py-4">{{ item.service }}</td>
+					<td class="px-16 py-4">{{ item.price | currency: 'BRL' }}</td>
+					<td class="px-6 py-4 text-right">
+						<div class="flex justify-end gap-6">
+							<button
+								type="button"
+								(click)="openModal(true, i)"
+								class="font-medium text-blue-600 hover:underline"
+							>
+								<ng-icon name="featherEdit" class="text-blue-600"></ng-icon>
+								Editar
+							</button>
+							<button
+								type="button"
+								(click)="excluirItem(i)"
+								class="font-medium text-red-600 hover:underline"
+							>
+								<ng-icon name="featherTrash" class="text-red-600"></ng-icon>
+								Excluir
+							</button>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div
+			*ngIf="scheduled.length > 5"
+			class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4"
+			aria-label="Table navigation"
+		>
+			<span
+				class="text-sm font-normal text-gray-500 mb-4 md:mb-0 block w-full md:inline md:w-auto"
+			>
+				Registros
+				<span class="font-semibold text-gray-900">{{ firstItemIndex }}</span> -
+				<span class="font-semibold text-gray-900">{{ lastItemIndex }}</span> de
+				<span class="font-semibold text-gray-900">{{ scheduled.length }}</span>
+			</span>
+			<div class="flex items-center space-x-1">
+				<button
+					(click)="goToFirstPage()"
+					[disabled]="isFirstPage()"
+					class="px-3 py-1 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					Primeira
+				</button>
+				<ng-container *ngFor="let page of totalPagesArray()">
+					<ng-container *ngIf="currentPage !== page">
+						<button
+							(click)="goToPage(page)"
+							class="px-3 py-1 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none"
+						>
+							{{ page }}
+						</button>
+					</ng-container>
+					<ng-container *ngIf="currentPage === page">
+						<div
+							[class.bg-green-500]="currentPage === page"
+							class="px-3 py-1 rounded-lg border border-gray-300 bg-green-500 text-white hover:bg-green-700 focus:outline-none cursor-default"
+						>
+							{{ page }}
+						</div>
+					</ng-container>
+				</ng-container>
+				<button
+					(click)="goToLastPage()"
+					[disabled]="isLastPage()"
+					class="px-3 py-1 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					Última
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<div
+		*ngIf="scheduled.length === 0"
+		class="flex justify-center p-4 bg-gray-50 shadow-lg rounded-lg"
+	>
+		<div class="flex-auto px-4 lg:px-10 py-10 pt-0 justify-center">
+			<div class="flex flex-wrap justify-center">
+				<span class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+					>Nenhum registro cadastrado</span
+				>
+			</div>
+		</div>
+	</div>
+</app-window>

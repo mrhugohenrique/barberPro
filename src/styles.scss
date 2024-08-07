@@ -1,1 +1,40 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'ngx-toastr/toastr';
+
+html,
+body {
+  background-color: #12131b;
+  min-height: 100vh;
+  overflow-y: auto; /* Garantir que o conteúdo principal seja rolável */
+
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: gray;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #000000;
+}
+
+
+.toast-container .ngx-toastr {
+  border-radius: 15px !important;
+  background-position: 15px center;
+  box-shadow: none;
+}
+

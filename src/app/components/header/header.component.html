@@ -1,0 +1,36 @@
+<header class="w-full h-[4.7em] px-[1.2em] py-4 bg-gray-800 flex items-center justify-between">
+	<div class="text-xl">
+		<img src="../../../assets/logo.png" alt="Logo BarberPRO" />
+	</div>
+	<ul class="hidden md:flex space-x-10 rounded-xl py-1 px-2">
+		<li>
+			<a
+				class="text-textColor font-bold border-b-2 hover:text-effectsColor transition-all"
+				routerLink="/about"
+			>
+				{{ 'header.about' }}</a
+			>
+		</li>
+		<li>
+			<a
+				routerLink="/specialties"
+				class="text-textColor font-bold border-b-2 hover:text-effectsColor transition-all"
+				>{{ 'header.specialties' }}</a
+			>
+		</li>
+		<li>
+			<a
+				class="text-textColor font-bold border-b-2 hover:text-effectsColor transition-all"
+				routerLink="/projects"
+			>
+				{{ 'header.projects' }}</a
+			>
+		</li>
+		<li>
+			<a class="text-primary font-bold rounded-xl py-1 px-2" routerLink="/contact">{{
+				'header.contact'
+			}}</a>
+		</li>
+	</ul>
+	<button class="block md:hidden"></button>
+</header>

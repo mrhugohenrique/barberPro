@@ -1,0 +1,19 @@
+<div class="flex w-full flex-col">
+	<label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" [for]="id">
+		{{ label }}
+	</label>
+	<input
+		class="text-gray-700 border rounded py-3 px-4 mb-3 leading-tight outline-none border-gray-500"
+		[ngClass]="{
+			'border-2 border-red-400': control && control.invalid && control.dirty,
+			'bg-gray-200': control.disabled,
+			'bg-white': !control.disabled
+		}"
+		[id]="id"
+		[type]="type"
+		[placeholder]="placeholder"
+		[formControl]="control"
+		(blur)="onBlur()"
+		[readonly]="control.disabled"
+	/>
+</div>

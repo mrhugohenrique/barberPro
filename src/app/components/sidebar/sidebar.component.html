@@ -1,0 +1,47 @@
+<div [ngClass]="{ '-ml-30 ': !isOpen }" class="sidebar bg-gray-800 text-white h-full">
+	<div class="justify-between items-center grid p-3">
+		<h1 class="text-2xl font-extrabold text-white" [ngClass]="{ grid: !isOpen }">
+			Barber
+			<span class="text-secondary"
+				>PRO
+
+				<button
+					(click)="toggleSidebar()"
+					class="py-1 px-1 duration-300 focus:!shadow-none focus:ring-2 gap-2 hover:bg-cloud-burst-950 items-center outline-none rounded transition-colors"
+				>
+					<ng-icon
+						[name]="!isOpen ? 'featherChevronRight' : 'featherChevronLeft'"
+						class="transition-transform duration-300"
+						size="24"
+					></ng-icon>
+				</button>
+			</span>
+		</h1>
+	</div>
+
+	<nav class="mt-4">
+		<ul>
+			<li>
+				<a
+					routerLink="/"
+					routerLinkActive="active"
+					class="block py-2 px-8 font-bold hover:bg-slate-800 transition-all"
+				>
+					<ng-icon name="featherHome" size="20"></ng-icon>
+					<span class="ml-2" *ngIf="isOpen">Dashboard</span>
+				</a>
+			</li>
+
+			<li *ngFor="let route of childRoutes">
+				<a
+					[routerLink]="route.path"
+					routerLinkActive="active"
+					class="block py-2 px-8 font-bold hover:bg-slate-800 transition-all"
+				>
+					<ng-icon [name]="route.icon" size="20"></ng-icon>
+					<span class="ml-2" *ngIf="isOpen">{{ route.title }}</span>
+				</a>
+			</li>
+		</ul>
+	</nav>
+</div>
