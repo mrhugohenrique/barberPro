@@ -20,7 +20,6 @@ import { environment } from '../../../environments/environment';
 	selector: 'app-my-account',
 	standalone: true,
 	templateUrl: './my-account.component.html',
-	styleUrl: './my-account.component.scss',
 	changeDetection: ChangeDetectionStrategy.Default,
 	imports: [CommonModule, FormsModule, ReactiveFormsModule, InputComponent, WindowComponent]
 })
@@ -32,7 +31,7 @@ export class MyAccountComponent implements OnInit {
 
 	user = this._userService.getUser();
 	loading = false;
-	readonly API_URL = `${environment.apiUrl}/api/auth/users`;
+	readonly API_URL = `${environment.apiUrl}/auth/user`;
 
 	readonly _formGroup = new FormGroup({
 		userId: new FormControl(null, Validators.required),
@@ -61,12 +60,6 @@ export class MyAccountComponent implements OnInit {
 
 		this.loading = true;
 		const { userId, name, newPassword } = this._formGroup.value;
-
-		console.log('Enviando requisição com dados:', {
-			userId,
-			name,
-			newPassword
-		}); // Adicione isto para debug
 		this._loaderService.showLoader();
 		this._httpClient
 			.put(this.API_URL, {
@@ -84,7 +77,6 @@ export class MyAccountComponent implements OnInit {
 				error: (error: any) => {
 					this.loading = false;
 					this._notifications.error(error.error.message);
-					console.error('Erro na requisição:', error);
 					this._loaderService.hideLoader();
 				}
 			});

@@ -12,7 +12,7 @@ import { environment } from '../../environments/environment';
 	providedIn: 'root'
 })
 export class AuthService {
-	private baseUrl = `${environment.apiUrl}/api/auth`;
+	private baseUrl = `${environment.apiUrl}/auth`;
 	constructor(
 		private _http: HttpClient,
 		@Inject(ToastrService)
@@ -80,7 +80,6 @@ export class AuthService {
 				return false;
 			}
 		} catch (error) {
-			console.error('Error decoding or validating token:', error);
 			return false;
 		}
 	}

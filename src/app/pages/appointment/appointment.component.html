@@ -1,0 +1,21 @@
+<div class="container mx-auto">
+	<div class="flex">
+		<div class="w-16 text-right">
+			<!-- Exibe as horas -->
+			<div *ngFor="let hour of hours">{{ hour | number: '2.0-0' }}:00</div>
+		</div>
+		<div class="flex-1 grid grid-cols-4 gap-4">
+			<!-- Colunas para cada membro da equipe -->
+			<div *ngFor="let staff of staffMembers">
+				<div class="text-center font-bold">{{ staff }}</div>
+				<div *ngFor="let hour of hours" class="h-12 border-t">
+					<!-- Busca agendamentos para cada hora e membro da equipe -->
+
+					<ng-template #freeBlock>
+						<div class="h-full bg-white"></div>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -6,6 +6,7 @@ import { LoginGuard } from './guard/login.guard';
 import { MyAccountComponent } from './pages/my-account/my-account.component';
 import { TypeHairCutComponent } from './pages/type-hair-cut/type-hair-cut.component';
 import { NewScheduleComponent } from './pages/new-schedule/new-schedule.component';
+import { AppointmentComponent } from './pages/appointment/appointment.component';
 
 export const routes: Route[] = [
 	{
@@ -30,6 +31,12 @@ export const routes: Route[] = [
 				title: 'Minha conta',
 				component: MyAccountComponent,
 				canActivateChild: [AuthGuard]
+			},
+			{
+				path: 'appointment',
+				title: 'Agendamento',
+				component: AppointmentComponent,
+				canActivateChild: [AuthGuard]
 			}
 		]
 	},
@@ -44,7 +51,8 @@ export const routeIcons: { [key: string]: string } = {
 	'': 'featherHome',
 	myAccount: 'featherFile',
 	typeHairCut: 'featherScissors',
-	newSchedule: 'featherCalendar'
+	newSchedule: 'featherCalendar',
+	appointment: 'featherClock'
 };
 
 export function getRouteIcon(path: string): string {

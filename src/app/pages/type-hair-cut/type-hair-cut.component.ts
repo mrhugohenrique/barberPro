@@ -17,12 +17,12 @@ import { catchError, finalize, tap, throwError } from 'rxjs';
 import { SelectComponent } from '../../components/select/select.component';
 import { LoaderService } from '../../components/loader/loader.service';
 import { environment } from '../../../environments/environment';
+import { httpClientResponse, Product } from '../../services/types';
 
 @Component({
 	selector: 'app-type-hair-cut',
 	standalone: true,
 	templateUrl: './type-hair-cut.component.html',
-	styleUrl: './type-hair-cut.component.scss',
 	imports: [
 		CommonModule,
 		WindowComponent,
@@ -38,12 +38,12 @@ import { environment } from '../../../environments/environment';
 export class TypeHairCutComponent implements OnInit {
 	isModalOpen = false;
 	modalTitle = '';
-	tipoHairCuts: TipoHairCut[] = [];
+	tipoHairCuts: Product[] = [];
 	pageSize: number = 5;
 	currentPage: number = 1;
 	Math = Math;
 
-	private baseUrl = `${environment.apiUrl}/api/products`;
+	private baseUrl = `${environment.apiUrl}/products`;
 
 	private _notifications = inject(ToastrService);
 	private _HttpClient = inject(HttpClient);
@@ -61,7 +61,7 @@ export class TypeHairCutComponent implements OnInit {
 	getAllItems() {
 		this._loading.showLoader();
 		this._HttpClient
-			.get<TipoHairCut[]>(`${this.baseUrl}`)
+			.get<Product[]>(`${this.baseUrl}`)
 			.pipe(
 				tap((response) => {
 					this.tipoHairCuts = response;
@@ -73,19 +73,20 @@ export class TypeHairCutComponent implements OnInit {
 			.subscribe();
 	}
 
-	saveItem(forms: any) {
-		const { id, name, price } = forms;
-		(forms.id
-			? this._HttpClient.put(`${this.baseUrl}/${id}`, { name, price })
-			: this._HttpClient.post(`${this.baseUrl}`, { name, price })
-		)
+	saveItem(form: Product) {
+		const { id, name, price } = form;
+		const request = id
+			? this._HttpClient.put<httpClientResponse>(`${this.baseUrl}/${id}`, { name, price })
+			: this._HttpClient.post<httpClientResponse>(`${this.baseUrl}`, { name, price });
+
+		request
 			.pipe(
-				tap((resp: any) => {
+				tap((resp: httpClientResponse) => {
 					const { response } = resp;
-					if (response) {
+					if (response.success) {
 						this.closeModal();
 						this._formGroup.reset();
-						this._notifications.success(resp.message);
+						this._notifications.success(response.message);
 						this.getAllItems();
 					} else {
 						this._notifications.error(response.message);
@@ -96,7 +97,7 @@ export class TypeHairCutComponent implements OnInit {
 				}),
 				catchError((error) => {
 					this._formGroup.enable();
-					this._notifications.error(error.error.message);
+					this._notifications.error(error.error.message || 'Erro ao salvar item.');
 					return throwError(error);
 				})
 			)
@@ -105,10 +106,10 @@ export class TypeHairCutComponent implements OnInit {
 
 	addItem() {
 		if (this._formGroup.valid) {
-			const newItem = {
-				id: this._formGroup.value.id,
-				name: String(this._formGroup.value.name),
-				price: String(this._formGroup.value.price)
+			const newItem: Product = {
+				id: this._formGroup.value.id ?? 0,
+				name: this._formGroup.value.name,
+				price: this._formGroup.value.price
 			};
 			this._formGroup.disable();
 			this._loading.showLoader();
@@ -163,7 +164,7 @@ export class TypeHairCutComponent implements OnInit {
 		return Math.min(this.currentPage * this.pageSize, this.tipoHairCuts.length);
 	}
 
-	get displayedItems(): TipoHairCut[] {
+	get displayedItems(): Product[] {
 		const startIndex = (this.currentPage - 1) * this.pageSize;
 		return this.tipoHairCuts.slice(startIndex, startIndex + this.pageSize);
 	}
@@ -200,9 +201,4 @@ export class TypeHairCutComponent implements OnInit {
 			this.currentPage = Math.ceil(this.tipoHairCuts.length / this.pageSize);
 		}
 	}
-}
-interface TipoHairCut {
-	id: number;
-	name: string;
-	price: number | string;
 }

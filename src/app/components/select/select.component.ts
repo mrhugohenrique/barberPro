@@ -12,7 +12,7 @@ import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 export class SelectComponent implements OnInit {
 	@Input() label: string = '';
 	@Input() id: string = 'app-select';
-	@Input() options: { label: string; value: string | number }[] = [];
+	@Input() options: selectOption[] = [];
 	@Input() control: FormControl = new FormControl();
 	@Input() disabled: boolean = false;
 	@Input() required: boolean = false;
@@ -29,3 +29,8 @@ export class SelectComponent implements OnInit {
 		}
 	}
 }
+
+export type selectOption = {
+	label: string;
+	value: number;
+};

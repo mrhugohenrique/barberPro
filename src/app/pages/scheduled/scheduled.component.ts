@@ -10,7 +10,6 @@ import { NgIconComponent, provideIcons } from '@ng-icons/core';
 	standalone: true,
 	imports: [WindowComponent, CommonModule, FormsModule, ReactiveFormsModule, NgIconComponent],
 	templateUrl: './scheduled.component.html',
-	styleUrl: './scheduled.component.scss',
 	viewProviders: [provideIcons(allFeatherIcons)],
 	changeDetection: ChangeDetectionStrategy.Default
 })
@@ -35,7 +34,6 @@ export class ScheduledComponent {
 
 	excluirItem(index: number): void {
 		const id = this.scheduled[index].id;
-		console.log('Excluindo o item:', id);
 	}
 
 	get firstItemIndex(): number {

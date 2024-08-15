@@ -31,11 +31,11 @@ export class HomeComponent implements OnInit {
 	constructor(private router: Router) {}
 
 	ngOnInit(): void {
-		this.checkRoute(this.router.url); // Verifica a rota inicial
+		this.checkRoute(this.router.url);
 
 		this.router.events.subscribe((event) => {
 			if (event instanceof NavigationEnd) {
-				this.checkRoute(event.urlAfterRedirects); // Verifica a rota sempre que há uma mudança
+				this.checkRoute(event.urlAfterRedirects);
 			}
 		});
 	}
@@ -45,7 +45,6 @@ export class HomeComponent implements OnInit {
 	}
 
 	checkRoute(url: string): void {
-		// Mostrar o botão apenas na rota raiz (home)
 		this.showButton = url === '/' || url === '/home';
 	}
 
