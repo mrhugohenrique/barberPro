@@ -29,7 +29,6 @@ import { httpClientResponse, Product, ProductsResponse } from '../../services/ty
 		SelectComponent
 	],
 	templateUrl: './new-schedule.component.html',
-	styleUrl: './new-schedule.component.scss',
 	changeDetection: ChangeDetectionStrategy.Default
 })
 export class NewScheduleComponent implements OnInit {

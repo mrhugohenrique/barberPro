@@ -13,6 +13,8 @@
 		[type]="type"
 		[placeholder]="placeholder"
 		[formControl]="control"
+		[value]="value"
+		(input)="onInput($event)"
 		(blur)="onBlur()"
 		[readonly]="control.disabled"
 	/>

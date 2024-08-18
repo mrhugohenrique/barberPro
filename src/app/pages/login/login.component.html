@@ -1,92 +1,79 @@
-<div class='w-full min-h-screen flex flex-col justify-center items-center px-4'>
-  <img
-    src='../../../assets/logo.png'
-    alt='Logo BarberPRO'
-    class='mb-10'
-  />
+<div class="w-full min-h-screen flex flex-col justify-center items-center px-4">
+	<img src="../../../assets/logo.png" alt="Logo BarberPRO" class="mb-10" />
 
-  <form *ngIf="!isRegister; else loginForm" (ngSubmit)="onSubmit()" class='w-full flex flex-col gap-3 max-w-[31.25em]'>
-    <input
-      class='w-full rounded h-11 px-4 text-black bg-primary'
-      id="email-address" 
-      name="email" 
-      [type]="'email'"
-      autocomplete="email"
-      placeholder='Digite seu email...'
-      [formControl]="_formGroup.controls.email"
-    />
-    <input
-      class='w-full rounded h-11 px-4 text-black bg-primary'
-      [formControl]="_formGroup.controls.password" 
-      id="login-password" 
-      name="password" 
-      type="password"
-      autocomplete="current-password"
-      placeholder='************'
-    />
-    <button 
-      type="submit"
-      class='w-full rounded h-11 bg-secondary font-bold text-bg' 
-    >
-      Acessar
-    </button>
-    <div class="text-sm text-center">
-      <button 
-        type="button"
-        (click)="register()"
-        class='w-full rounded h-11 font-medium text-indigo-600 hover:text-indigo-500' 
-      >
-        Registrar-se
-      </button>
-    </div>
-  </form>
+	<form
+		*ngIf="!isRegister; else loginForm"
+		(ngSubmit)="onSubmit()"
+		class="w-full flex flex-col gap-3 max-w-[31.25em]"
+	>
+		<input
+			class="w-full rounded h-11 px-4 text-black bg-primary"
+			id="email-address"
+			name="email"
+			[type]="'email'"
+			autocomplete="email"
+			placeholder="Digite seu email..."
+			[formControl]="_formGroup.controls.email"
+		/>
+		<input
+			class="w-full rounded h-11 px-4 text-black bg-primary"
+			[formControl]="_formGroup.controls.password"
+			id="login-password"
+			name="password"
+			type="password"
+			autocomplete="current-password"
+			placeholder="************"
+		/>
+		<button type="submit" class="w-full rounded h-11 bg-secondary font-bold text-bg">
+			Acessar
+		</button>
+		<div class="text-sm text-center">
+			<button
+				type="button"
+				(click)="register()"
+				class="w-full rounded h-11 font-medium text-indigo-600 hover:text-indigo-500"
+			>
+				Registrar-se
+			</button>
+		</div>
+	</form>
 
-  <ng-template #loginForm>
-    <!-- Formulário de Registro -->
-    <form  (ngSubmit)="onSubmitRegister()" class='w-full flex flex-col gap-3 max-w-[31.25em]'>
-      <input
-        class='w-full rounded h-11 px-4 text-white bg-primary'
-        id="name-user" 
-        name="Nome" 
-        type="text"
-        placeholder='Digite seu nome...'
-        [formControl]="_formGroup.controls.name"
-      />
-      <input
-        class='w-full rounded h-11 px-4 text-white bg-primary'
-        id="register-email" 
-        name="email" 
-        type="email"
-        autocomplete="email"
-        placeholder='Digite seu email...'
-        [formControl]="_formGroup.controls.email"
-      />
-      <input
-        class='w-full rounded h-11 px-4 text-white bg-primary'
-        [formControl]="_formGroup.controls.password" 
-        id="register-password" 
-        name="password" 
-        type="password"
-        autocomplete="current-password"
-        placeholder='************'
-      />
+	<ng-template #loginForm>
+		<!-- Formulário de Registro -->
+		<form (ngSubmit)="onSubmitRegister()" class="w-full flex flex-col gap-3 max-w-[31.25em] bg-gray-300 p-5 rounded-sm">
+			<app-input
+				[id]="'name-user'"
+				[label]="'Nome'"
+				placeholder="Digite seu nome"
+				[formControl]="_formGroup.controls.name"
+			></app-input>
+			<app-input
+				[id]="'email-address'"
+				[label]="'email'"
+				[type]="'email'"
+				placeholder="Digite seu email..."
+				[formControl]="_formGroup.controls.email"
+			></app-input>
+			<app-input
+				[id]="'login-password'"
+				[label]="'Senha'"
+				placeholder="Digite seu senha..."
+				[formControl]="_formGroup.controls.password"
+			></app-input>
 
-      <button 
-        type="submit"
-        class='w-full rounded h-11 bg-secondary font-bold text-bg' 
-      >
-        Cadastrar-se
-      </button>
+			<button type="submit" class="w-full rounded h-11 bg-secondary font-bold text-bg">
+				Cadastrar-se
+			</button>
 
-      <div class="text-sm text-center">
-        <button 
-          type="button"
-          (click)="register()"
-          class='w-full rounded h-11 font-medium text-indigo-600 hover:text-indigo-500' 
-        >
-          Voltar para Login
-        </button>
-      </div>
-    </form>
-  </ng-template>
+			<div class="text-sm text-center">
+				<button
+					type="button"
+					(click)="register()"
+					class="w-full rounded h-11 font-medium text-indigo-600 hover:text-indigo-500"
+				>
+					Voltar para Login
+				</button>
+			</div>
+		</form>
+	</ng-template>
 </div>

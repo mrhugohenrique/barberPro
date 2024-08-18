@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import {
   FormControl,
@@ -10,17 +10,17 @@ import {
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { InputComponent } from '../../components/input/input.component';
 @Component({
   selector: 'app-login',
   standalone: true,
   providers: [AuthService],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, InputComponent],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+
 })
 export class LoginComponent {
   isRegister: boolean = false;
-
    _notifications= inject(ToastrService);
   readonly _formGroup = new FormGroup({
     email: new FormControl(null, Validators.required),
@@ -28,7 +28,7 @@ export class LoginComponent {
     name: new FormControl(null),
   });
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private _cdr: ChangeDetectorRef) {}
   toggleForm() {
     this.isRegister = !this.isRegister;
   }
@@ -58,6 +58,8 @@ export class LoginComponent {
   }
 
   register() {
+    this._formGroup.reset();
     this.isRegister = !this.isRegister;
+    this._cdr.detectChanges();
   }
 }
