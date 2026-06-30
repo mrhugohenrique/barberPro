@@ -1,47 +1,42 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { LoaderService } from '../../components/loader/loader.service';
-import { finalize, catchError, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { httpClientResponse } from '../../services/types';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { WindowComponent } from '../../components/window/window.component';
 
 @Component({
 	selector: 'app-appointment',
 	standalone: true,
 	templateUrl: './appointment.component.html',
-	imports: [CommonModule, FormsModule, ReactiveFormsModule]
+	imports: [CommonModule, FormsModule, ReactiveFormsModule, WindowComponent],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppointmentComponent implements OnInit {
-	private baseUrl = `${environment.apiUrl}`;
-	appointments: Appointment[] = [];
-	hours = Array.from({ length: 22 }, (_, i) => 8 + i / 2); // Horas do dia, de 8:00 a 18:00 a cada 30 minutos
-	staffMembers = ['Mary', 'John', 'Miranda', 'Michael'];
+	private readonly baseUrl = `${environment.apiUrl}`;
+	private readonly _notifications = inject(ToastrService);
+	private readonly _HttpClient = inject(HttpClient);
 
-	private _notifications = inject(ToastrService);
-	private _HttpClient = inject(HttpClient);
-	private _loading = inject(LoaderService);
+	readonly appointments = signal<Appointment[]>([]);
+	readonly hours = Array.from({ length: 21 }, (_, i) => 8 + i / 2); // Horários: 8:00 a 18:00
+	readonly staffMembers = ['Mary', 'John', 'Miranda', 'Michael'];
 
 	ngOnInit() {
 		this.loadAppointments();
-		this.appointments = this.getAppointments();
+		this.appointments.set(this.getAppointments());
 	}
 
-	generateTimes(): string[] {
-		const times = [];
-		for (let hour = 8; hour < 18; hour++) {
-			times.push(`${hour}:00`, `${hour}:30`);
-		}
-		return times;
+	getStaffAppointments(staff: string): Appointment[] {
+		return this.appointments().filter((app) => app.staffMember === staff);
 	}
 
-	findAppointment(staff: string, time: string): Appointment | null {
-		return (
-			this.appointments.find((app) => app.staffMember === staff && app.startTime === time) ||
-			null
-		);
+	formatHourLabel(hour: number): string {
+		const h = Math.floor(hour);
+		const m = hour % 1 === 0 ? '00' : '30';
+		return `${h.toString().padStart(2, '0')}:${m}`;
 	}
 
 	getAppointments(): Appointment[] {
@@ -50,64 +45,84 @@ export class AppointmentComponent implements OnInit {
 				staffMember: 'Mary',
 				clientName: 'Brenda Massey',
 				serviceType: 'Blow Dry',
-				startTime: '9:00',
+				startTime: '09:00',
 				endTime: '10:00',
-				color: 'bg-blue-300'
+				color: 'bg-blue-200 border-l-4 border-blue-500 text-blue-900'
 			},
 			{
 				staffMember: 'John',
 				clientName: 'Zachary Kelley',
 				serviceType: 'Beard Grooming',
-				startTime: '9:00',
+				startTime: '09:00',
 				endTime: '10:00',
-				color: 'bg-yellow-300'
+				color: 'bg-yellow-200 border-l-4 border-yellow-500 text-yellow-900'
 			},
 			{
 				staffMember: 'John',
 				clientName: 'Jenny Murtaugh',
-				serviceType: 'Beard Grooming',
+				serviceType: 'Haircut & Styling',
 				startTime: '10:00',
 				endTime: '11:00',
-				color: 'bg-pink-300'
+				color: 'bg-pink-200 border-l-4 border-pink-500 text-pink-900'
 			},
 			{
 				staffMember: 'Miranda',
 				clientName: 'Diana Campos',
 				serviceType: 'Balinese Massage',
-				startTime: '9:45',
+				startTime: '09:30',
 				endTime: '11:00',
-				color: 'bg-teal-300'
+				color: 'bg-teal-200 border-l-4 border-teal-500 text-teal-900'
+			},
+			{
+				staffMember: 'Michael',
+				clientName: 'Robert Vance',
+				serviceType: 'Shaving & Care',
+				startTime: '12:30',
+				endTime: '13:30',
+				color: 'bg-indigo-200 border-l-4 border-indigo-500 text-indigo-900'
 			}
 		];
 	}
 
 	loadAppointments() {
-		this._loading.showLoader();
 		this._HttpClient
 			.get<httpClientResponse>(`${this.baseUrl}/appointments`)
 			.pipe(
-				finalize(() => {
-					this._loading.hideLoader();
-				}),
 				catchError((error) => {
-					this._notifications.error(error.error.message || 'Erro ao agendar serviço.');
+					this._notifications.error(error.error?.message || 'Erro ao carregar agendamentos.');
 					return throwError(error);
 				})
 			)
 			.subscribe();
 	}
+
 	calculatePosition(startTime: string): string {
-		const hour = parseInt(startTime.split(':')[0]);
-		const minute = parseInt(startTime.split(':')[1]);
-		return `${(hour - 8) * 100 + (minute / 60) * 50 - 2}px`;
+		const parts = startTime.split(':');
+		const hour = parseInt(parts[0], 10);
+		const minute = parseInt(parts[1], 10);
+		
+		// 8:00 é a linha base (0px). Cada hora tem 100px de altura (50px por 30min)
+		const position = (hour - 8) * 100 + (minute / 60) * 100;
+		return `${position}px`;
 	}
 
 	calculateHeight(startTime: string, endTime: string): string {
-		const startHour = parseInt(startTime.split(':')[0]);
-		const startMinute = parseInt(startTime.split(':')[1]);
-		const endHour = parseInt(endTime.split(':')[0]);
-		const endMinute = parseInt(endTime.split(':')[1]);
-		return `${(((endHour - startHour) * 60 + (endMinute - startMinute)) / 30) * 50 - 10}px`;
+		const startParts = startTime.split(':');
+		const endParts = endTime.split(':');
+		
+		const startHour = parseInt(startParts[0], 10);
+		const startMinute = parseInt(startParts[1], 10);
+		const endHour = parseInt(endParts[0], 10);
+		const endMinute = parseInt(endParts[1], 10);
+		
+		const totalStartMinutes = startHour * 60 + startMinute;
+		const totalEndMinutes = endHour * 60 + endMinute;
+		
+		const diffMinutes = totalEndMinutes - totalStartMinutes;
+		
+		// 1 minuto = 1.666px (100px por 60min)
+		const height = (diffMinutes / 60) * 100;
+		return `${height}px`;
 	}
 }
 

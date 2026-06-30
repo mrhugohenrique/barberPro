@@ -5,15 +5,14 @@ import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
-import { interceptorProvider } from './services/token.interceptor';
+import { tokenInterceptor } from './services/token.interceptor';
 import { LoaderInterceptor } from './components/loader/loader.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    interceptorProvider,
     provideHttpClient(
       withFetch(),
-      withInterceptors([LoaderInterceptor])
+      withInterceptors([tokenInterceptor, LoaderInterceptor])
     ),
     provideToastr({
       timeOut: 8000,

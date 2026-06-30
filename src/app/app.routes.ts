@@ -1,49 +1,56 @@
 import { Route } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { AuthGuard } from './guard/auth.guard';
+import { authGuard } from './guard/auth.guard';
 import { HomeComponent } from './pages/home/home.component';
-import { LoginGuard } from './guard/login.guard';
+import { loginGuard } from './guard/login.guard';
 import { MyAccountComponent } from './pages/my-account/my-account.component';
 import { TypeHairCutComponent } from './pages/type-hair-cut/type-hair-cut.component';
 import { NewScheduleComponent } from './pages/new-schedule/new-schedule.component';
 import { AppointmentComponent } from './pages/appointment/appointment.component';
+import { ScheduledComponent } from './pages/scheduled/scheduled.component';
 
 export const routes: Route[] = [
 	{
 		path: '',
 		component: HomeComponent,
-		canActivate: [AuthGuard],
+		canActivate: [authGuard],
 		children: [
+			{
+				path: '',
+				title: 'Dashboard',
+				component: ScheduledComponent,
+				canActivateChild: [authGuard]
+			},
 			{
 				path: 'newSchedule',
 				title: 'Agendamento',
 				component: NewScheduleComponent,
-				canActivateChild: [AuthGuard]
+				canActivateChild: [authGuard]
 			},
 			{
 				path: 'typeHairCut',
 				title: 'Tipo de corte',
 				component: TypeHairCutComponent,
-				canActivateChild: [AuthGuard]
+				canActivateChild: [authGuard]
 			},
 			{
 				path: 'myAccount',
 				title: 'Minha conta',
 				component: MyAccountComponent,
-				canActivateChild: [AuthGuard]
+				canActivateChild: [authGuard]
 			},
 			{
 				path: 'appointment',
 				title: 'Agendamento',
 				component: AppointmentComponent,
-				canActivateChild: [AuthGuard]
+				canActivateChild: [authGuard]
 			}
 		]
 	},
 	{
 		path: 'login',
 		component: LoginComponent,
-		canActivate: [LoginGuard]
+		canActivate: [loginGuard]
 	}
 ];
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import {
 	FormGroup,
 	FormControl,
@@ -9,41 +9,33 @@ import {
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { take } from 'rxjs';
 import { InputComponent } from '../../components/input/input.component';
 import { WindowComponent } from '../../components/window/window.component';
-import { LoaderService } from '../../components/loader/loader.service';
-import { environment } from '../../../environments/environment';
 
 @Component({
 	selector: 'app-my-account',
 	standalone: true,
 	templateUrl: './my-account.component.html',
-	changeDetection: ChangeDetectionStrategy.Default,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, FormsModule, ReactiveFormsModule, InputComponent, WindowComponent]
 })
 export class MyAccountComponent implements OnInit {
-	private _notifications = inject(ToastrService);
-	private _userService = inject(UserService);
-	private _httpClient = inject(HttpClient);
-	private _loaderService = inject(LoaderService);
+	private readonly _notifications = inject(ToastrService);
+	private readonly _userService = inject(UserService);
 
-	user = this._userService.getUser();
-	loading = false;
-	readonly API_URL = `${environment.apiUrl}/auth/user`;
+	readonly loading = signal(false);
 
 	readonly _formGroup = new FormGroup({
-		userId: new FormControl(null, Validators.required),
-		name: new FormControl<string | number | null>('', Validators.required),
+		userId: new FormControl<number | null>(null, Validators.required),
+		name: new FormControl<string | null>('', Validators.required),
 		email: new FormControl({ value: '', disabled: true }),
-		password: new FormControl(null),
-		newPassword: new FormControl(null)
+		password: new FormControl<string | null>(null),
+		newPassword: new FormControl<string | null>(null)
 	});
 
 	ngOnInit(): void {
 		const user = this._userService.getUser();
-		if (user) {
+		if (user && user.id) {
 			this._formGroup.patchValue({
 				userId: user.id,
 				name: user.name,
@@ -58,27 +50,28 @@ export class MyAccountComponent implements OnInit {
 			return;
 		}
 
-		this.loading = true;
+		this.loading.set(true);
+		this._formGroup.disable();
+
 		const { userId, name, newPassword } = this._formGroup.value;
-		this._loaderService.showLoader();
-		this._httpClient
-			.put(this.API_URL, {
-				userId,
-				name,
-				newPassword
-			})
-			.pipe(take(1))
-			.subscribe({
-				next: () => {
-					this._notifications.success('Informações atualizadas com sucesso!');
-					this.loading = false;
-					this._loaderService.hideLoader();
-				},
-				error: (error: any) => {
-					this.loading = false;
-					this._notifications.error(error.error.message);
-					this._loaderService.hideLoader();
-				}
-			});
+
+		this._userService.updateProfile(userId, name ?? '', newPassword ?? undefined).subscribe({
+			next: () => {
+				this._notifications.success('Informações atualizadas com sucesso!');
+				this.loading.set(false);
+				this._formGroup.enable();
+				this._formGroup.controls.email.disable(); // mantém email desativado
+				
+				// Atualizar dados locais salvos
+				const currentUser = this._userService.getUser();
+				this._userService.saveUser({ ...currentUser, name: name ?? undefined });
+			},
+			error: (error) => {
+				this.loading.set(false);
+				this._formGroup.enable();
+				this._formGroup.controls.email.disable();
+				this._notifications.error(error.error?.message || 'Erro ao atualizar dados.');
+			}
+		});
 	}
 }

@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, computed } from '@angular/core';
 import { WindowComponent } from '../../components/window/window.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { allFeatherIcons } from '../../components/sidebar/sidebar.component';
+import { appIcons } from '../../components/sidebar/sidebar.component';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 
 @Component({
@@ -10,76 +10,71 @@ import { NgIconComponent, provideIcons } from '@ng-icons/core';
 	standalone: true,
 	imports: [WindowComponent, CommonModule, FormsModule, ReactiveFormsModule, NgIconComponent],
 	templateUrl: './scheduled.component.html',
-	viewProviders: [provideIcons(allFeatherIcons)],
-	changeDetection: ChangeDetectionStrategy.Default
+	viewProviders: [provideIcons(appIcons)],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ScheduledComponent {
-	scheduled: TipoSheduled[] = [
-		{ id: 1, name: 'João', service: 'Barba', price: '50' },
-		{ id: 2, name: 'Mariana', service: 'Corte', price: '45' },
-		{ id: 3, name: 'Lucas', service: 'Corte', price: '45' },
-		{ id: 4, name: 'Vitor', service: 'Barba', price: '50' },
-		{ id: 5, name: 'Pedro', service: 'Corte', price: '45' },
-		{ id: 6, name: 'Lucas', service: 'Corte', price: '45' },
-		{ id: 7, name: 'Vitor', service: 'Barba', price: '50' }
-	];
-	modalTitle = '';
-	isModalOpen = false;
-	pageSize: number = 5;
-	currentPage: number = 1;
+	readonly scheduled = signal<TipoSheduled[]>([
+		{ id: 1, name: 'João', service: 'Barba', price: 50 },
+		{ id: 2, name: 'Mariana', service: 'Corte', price: 45 },
+		{ id: 3, name: 'Lucas', service: 'Corte', price: 45 },
+		{ id: 4, name: 'Vitor', service: 'Barba', price: 50 },
+		{ id: 5, name: 'Pedro', service: 'Corte', price: 45 },
+		{ id: 6, name: 'Lucas', service: 'Corte', price: 45 },
+		{ id: 7, name: 'Vitor', service: 'Barba', price: 50 }
+	]);
 
-	openModal(isEdit = false, index?: number) {
-		this.isModalOpen = true;
+	readonly modalTitle = signal('');
+	readonly isModalOpen = signal(false);
+	readonly pageSize = signal(5);
+	readonly currentPage = signal(1);
+
+	readonly firstItemIndex = computed(() => (this.currentPage() - 1) * this.pageSize() + 1);
+
+	readonly lastItemIndex = computed(() => 
+		Math.min(this.currentPage() * this.pageSize(), this.scheduled().length)
+	);
+
+	readonly displayedItems = computed(() => {
+		const startIndex = (this.currentPage() - 1) * this.pageSize();
+		return this.scheduled().slice(startIndex, startIndex + this.pageSize());
+	});
+
+	readonly totalPages = computed(() => 
+		Math.ceil(this.scheduled().length / this.pageSize())
+	);
+
+	readonly isFirstPage = computed(() => this.currentPage() === 1);
+	readonly isLastPage = computed(() => this.currentPage() === this.totalPages() || this.totalPages() === 0);
+
+	openModal(isEdit = false) {
+		this.modalTitle.set(isEdit ? 'Editar Agendamento' : 'Novo Agendamento');
+		this.isModalOpen.set(true);
 	}
 
 	excluirItem(index: number): void {
-		const id = this.scheduled[index].id;
-	}
-
-	get firstItemIndex(): number {
-		return (this.currentPage - 1) * this.pageSize + 1;
-	}
-
-	get lastItemIndex(): number {
-		return Math.min(this.currentPage * this.pageSize, this.scheduled.length);
-	}
-
-	get displayedItems(): TipoSheduled[] {
-		const startIndex = (this.currentPage - 1) * this.pageSize;
-		return this.scheduled.slice(startIndex, startIndex + this.pageSize);
-	}
-
-	isFirstPage(): boolean {
-		return this.currentPage === 1;
-	}
-
-	isLastPage(): boolean {
-		return this.currentPage === Math.ceil(this.scheduled.length / this.pageSize);
+		const items = this.displayedItems();
+		const id = items[index].id;
+		// Remove localmente o agendamento simulado
+		this.scheduled.update((list) => list.filter((item) => item.id !== id));
 	}
 
 	totalPagesArray(): number[] {
-		return Array(Math.ceil(this.scheduled.length / this.pageSize))
-			.fill(0)
-			.map((x, i) => i + 1);
+		return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
 	}
 
 	goToFirstPage(): void {
-		if (!this.isFirstPage()) {
-			this.currentPage = 1;
-		}
+		this.currentPage.set(1);
 	}
 
 	goToPage(page: number): void {
-		if (this.currentPage === page) return;
-		if (page >= 1 && page <= Math.ceil(this.scheduled.length / this.pageSize)) {
-			this.currentPage = page;
+		if (page >= 1 && page <= this.totalPages()) {
+			this.currentPage.set(page);
 		}
 	}
 
 	goToLastPage(): void {
-		if (!this.isLastPage()) {
-			this.currentPage = Math.ceil(this.scheduled.length / this.pageSize);
-		}
+		this.currentPage.set(this.totalPages() || 1);
 	}
 }
 

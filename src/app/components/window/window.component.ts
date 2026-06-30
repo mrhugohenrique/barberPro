@@ -1,20 +1,19 @@
-import { Component, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-window',
-  standalone: true,
-  imports: [],
-  templateUrl: './window.component.html',
-  styleUrl: './window.component.scss'
+	selector: 'app-window',
+	standalone: true,
+	imports: [],
+	templateUrl: './window.component.html',
+	styleUrl: './window.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WindowComponent {
-  @Input() title: string = 'Default Title';
+	private readonly _router = inject(Router);
+	readonly title = input<string>('Default Title');
 
-  constructor(private _rounter: Router) { }
-
-  close() {
-    this._rounter.navigate(['']);
-    window.close();
-  }
+	close() {
+		this._router.navigate(['/']);
+	}
 }

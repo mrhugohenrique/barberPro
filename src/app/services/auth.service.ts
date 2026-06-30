@@ -1,4 +1,4 @@
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
@@ -12,14 +12,12 @@ import { environment } from '../../environments/environment';
 	providedIn: 'root'
 })
 export class AuthService {
+	private readonly _http = inject(HttpClient);
+	private readonly _notifications = inject(ToastrService);
+	private readonly _userService = inject(UserService);
+	private readonly platformId = inject<object>(PLATFORM_ID);
+
 	private baseUrl = `${environment.apiUrl}/auth`;
-	constructor(
-		private _http: HttpClient,
-		@Inject(ToastrService)
-		private _notifications: ToastrService,
-		private _userService: UserService,
-		@Inject(PLATFORM_ID) private platformId: any
-	) {}
 
 	login(email: string, password: string) {
 		return this._http
@@ -36,7 +34,7 @@ export class AuthService {
 					}
 				}),
 				catchError((error) => {
-					this._notifications.error(error.error.message);
+					this._notifications.error(error.error?.message || 'Erro ao realizar login.');
 					return throwError(error);
 				})
 			);
@@ -47,11 +45,11 @@ export class AuthService {
 			.post<{ token: string }>(`${this.baseUrl}/register`, { name, email, password })
 			.pipe(
 				tap((response) => {
-					localStorage.setItem('loginToken', response.token),
-						this._notifications.success('Usuário criado com sucesso!');
+					localStorage.setItem('loginToken', JSON.stringify({ token: response.token })),
+						this._notifications.success('Usuário criado com sucesso!');
 				}),
 				catchError((error) => {
-					this._notifications.error(error.error.message);
+					this._notifications.error(error.error?.message || 'Erro ao criar usuário.');
 					return throwError(error);
 				})
 			);
@@ -69,7 +67,7 @@ export class AuthService {
 
 		try {
 			const parsedToken = JSON.parse(token);
-			const decodedToken: any = jwtDecode(parsedToken.token);
+			const decodedToken = jwtDecode<{ exp: number }>(parsedToken.token);
 			const expirationDate = new Date(0);
 			expirationDate.setUTCSeconds(decodedToken.exp);
 

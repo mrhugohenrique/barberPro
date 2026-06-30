@@ -1,12 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, DestroyRef, signal } from '@angular/core';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { HeaderComponent } from '../../components/header/header.component';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { LoaderComponent } from '../../components/loader/loader.component';
-import { ScheduledComponent } from '../scheduled/scheduled.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
 	selector: 'app-home',
@@ -16,24 +14,25 @@ import { ScheduledComponent } from '../scheduled/scheduled.component';
 	imports: [
 		CommonModule,
 		FooterComponent,
-		HeaderComponent,
 		RouterOutlet,
-		HttpClientModule,
 		SidebarComponent,
-		LoaderComponent,
-		ScheduledComponent
-	]
+		LoaderComponent
+	],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {
-	showButton: boolean = true;
-	isSidebarOpen = true;
+	private readonly router = inject(Router);
+	private readonly destroyRef = inject(DestroyRef);
 
-	constructor(private router: Router) {}
+	readonly showButton = signal(true);
+	readonly isSidebarOpen = signal(true);
 
 	ngOnInit(): void {
 		this.checkRoute(this.router.url);
 
-		this.router.events.subscribe((event) => {
+		this.router.events.pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe((event) => {
 			if (event instanceof NavigationEnd) {
 				this.checkRoute(event.urlAfterRedirects);
 			}
@@ -41,11 +40,11 @@ export class HomeComponent implements OnInit {
 	}
 
 	toggleSidebar() {
-		this.isSidebarOpen = !this.isSidebarOpen;
+		this.isSidebarOpen.update((open) => !open);
 	}
 
 	checkRoute(url: string): void {
-		this.showButton = url === '/' || url === '/home';
+		this.showButton.set(url === '/' || url === '/home');
 	}
 
 	navigateToMyAccount() {

@@ -1,21 +1,23 @@
-<div [ngClass]="{ '-ml-30 ': !isOpen }" class="sidebar bg-gray-800 text-white h-full">
+<div [ngClass]="{ '-ml-64': !isOpen() }" class="sidebar bg-gray-800 text-white h-full">
 	<div class="justify-between items-center grid p-3">
-		<h1 class="text-2xl font-extrabold text-white" [ngClass]="{ grid: !isOpen }">
-			Barber
-			<span class="text-secondary"
-				>PRO
-
+		<h1 class="text-2xl font-extrabold text-white" [ngClass]="{ 'text-center': !isOpen() }">
+			@if (isOpen()) {
+				Barber <span class="text-secondary">PRO</span>
+			} @else {
+				<span class="text-secondary">B</span>
+			}
+			<div class="mt-2 text-center">
 				<button
 					(click)="toggleSidebar()"
-					class="py-1 px-1 duration-300 focus:!shadow-none focus:ring-2 gap-2 hover:bg-cloud-burst-950 items-center outline-none rounded transition-colors"
+					class="py-1 px-1 duration-300 focus:!shadow-none focus:ring-2 gap-2 hover:bg-slate-700 items-center outline-none rounded transition-colors"
 				>
 					<ng-icon
-						[name]="!isOpen ? 'featherChevronRight' : 'featherChevronLeft'"
+						[name]="!isOpen() ? 'featherChevronRight' : 'featherChevronLeft'"
 						class="transition-transform duration-300"
 						size="24"
 					></ng-icon>
 				</button>
-			</span>
+			</div>
 		</h1>
 	</div>
 
@@ -25,23 +27,30 @@
 				<a
 					routerLink="/"
 					routerLinkActive="active"
-					class="block py-2 px-8 font-bold hover:bg-slate-800 transition-all"
+					[routerLinkActiveOptions]="{ exact: true }"
+					class="flex items-center py-2 px-6 font-bold hover:bg-slate-700 transition-all"
 				>
 					<ng-icon name="featherHome" size="20"></ng-icon>
-					<span class="ml-2" *ngIf="isOpen">Dashboard</span>
+					@if (isOpen()) {
+						<span class="ml-2">Dashboard</span>
+					}
 				</a>
 			</li>
 
-			<li *ngFor="let route of childRoutes">
-				<a
-					[routerLink]="route.path"
-					routerLinkActive="active"
-					class="block py-2 px-8 font-bold hover:bg-slate-800 transition-all"
-				>
-					<ng-icon [name]="route.icon" size="20"></ng-icon>
-					<span class="ml-2" *ngIf="isOpen">{{ route.title }}</span>
-				</a>
-			</li>
+			@for (route of childRoutes; track route.path) {
+				<li>
+					<a
+						[routerLink]="route.path"
+						routerLinkActive="active"
+						class="flex items-center py-2 px-6 font-bold hover:bg-slate-700 transition-all"
+					>
+						<ng-icon [name]="route.icon" size="20"></ng-icon>
+						@if (isOpen()) {
+							<span class="ml-2">{{ route.title }}</span>
+						}
+					</a>
+				</li>
+			}
 		</ul>
 	</nav>
 </div>

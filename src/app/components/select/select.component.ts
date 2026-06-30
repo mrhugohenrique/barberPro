@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 
@@ -7,30 +7,32 @@ import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 	standalone: true,
 	imports: [CommonModule, ReactiveFormsModule],
 	templateUrl: './select.component.html',
-	styleUrls: ['./select.component.scss']
+	styleUrls: ['./select.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SelectComponent implements OnInit {
-	@Input() label: string = '';
-	@Input() id: string = 'app-select';
-	@Input() options: selectOption[] = [];
-	@Input() control: FormControl = new FormControl();
-	@Input() disabled: boolean = false;
-	@Input() required: boolean = false;
+	readonly label = input<string>('');
+	readonly id = input<string>('app-select');
+	readonly options = input<selectOption[]>([]);
+	readonly control = input<FormControl>(new FormControl());
+	readonly disabled = input<boolean>(false);
+	readonly required = input<boolean>(false);
 
 	ngOnInit() {
-		if (this.required) {
-			this.control.setValidators([Validators.required]);
-			this.control.updateValueAndValidity();
+		const ctrl = this.control();
+		if (this.required()) {
+			ctrl.setValidators([Validators.required]);
+			ctrl.updateValueAndValidity();
 		}
-		if (this.disabled) {
-			this.control.disable({ emitEvent: false });
+		if (this.disabled()) {
+			ctrl.disable({ emitEvent: false });
 		} else {
-			this.control.enable({ emitEvent: false });
+			ctrl.enable({ emitEvent: false });
 		}
 	}
 }
 
 export type selectOption = {
 	label: string;
-	value: number;
+	value: number | string;
 };

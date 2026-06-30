@@ -1,6 +1,16 @@
 {
 	"root": true,
-	"ignorePatterns": ["projects/**/*"],
+	"ignorePatterns": [
+		"projects/**/*",
+		"dist/**/*",
+		"node_modules/**/*",
+		"package.json",
+		"package-lock.json",
+		"angular.json",
+		"tsconfig*.json",
+		".eslintrc.json",
+		"prerendered-routes.json"
+	],
 	"overrides": [
 		{
 			"files": ["*.ts"],
